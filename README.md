@@ -29,7 +29,7 @@ The repository contains a Python script that:
 
 ## 📝 Activity Log
 
-All daily activities are tracked in `daily_activity.log` with timestamps.
+All daily activities are tracked in `daily_activity.log` with timestamps
 
 ## ⚙️ Technology Stack
 
