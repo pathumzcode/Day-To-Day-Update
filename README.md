@@ -65,7 +65,7 @@ run_auto_commit.bat
 
 ## 📝 Activity Log
 
-All daily activities are tracked in `daily_activity.log` with timestamps.
+All daily activities are tracked in `daily_activity.log` with timestamps
 
 ## 🔧 Technology Stack
 
@@ -93,4 +93,4 @@ This is an automated activity tracker. For my actual coding projects and contrib
 
 ---
 
-**Profile:** [@pathumzcode](https://github.com/pathumzcode) | **Automated:** ✅ GitHub Actions
+**Profile:** [@pathumzcode](https://github.com/pathumzcode)
