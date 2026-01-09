@@ -18,6 +18,15 @@ def run_command(cmd):
         print(f"Error: {e.stderr}")
         return False
 
+def get_current_branch():
+    """Get the current git branch name"""
+    try:
+        result = subprocess.run("git rev-parse --abbrev-ref HEAD", 
+                              shell=True, capture_output=True, text=True, check=True)
+        return result.stdout.strip()
+    except subprocess.CalledProcessError:
+        return "main"  # Default to main if can't detect
+
 def auto_commit():
     """Make an automatic commit to keep GitHub streak alive"""
     
@@ -26,6 +35,14 @@ def auto_commit():
     os.chdir(repo_path)
     
     print(f"Working in: {repo_path}")
+    
+    # Get current branch
+    current_branch = get_current_branch()
+    print(f"Current branch: {current_branch}")
+    
+    # Pull latest changes first to avoid conflicts
+    print("\n1. Pulling latest changes...")
+    run_command(f"git pull origin {current_branch}")
     
     # Create/update activity file
     activity_file = "daily_activity.log"
@@ -41,30 +58,38 @@ def auto_commit():
     print("\n🔄 Starting git operations...")
     
     # Check git status
-    print("\n1. Checking git status...")
+    print("\n2. Checking git status...")
     run_command("git status")
     
     # Add changes
-    print("\n2. Adding changes...")
+    print("\n3. Adding changes...")
     if not run_command(f"git add {activity_file}"):
         print("❌ Failed to add changes")
         return False
     
+    # Check if there are actual changes to commit
+    result = subprocess.run("git diff --cached --quiet", 
+                          shell=True, capture_output=True)
+    if result.returncode == 0:
+        print("ℹ️ No changes to commit (already up to date)")
+        return True
+    
     # Commit
     commit_message = f"Daily update: {date_only}"
-    print(f"\n3. Creating commit: '{commit_message}'...")
+    print(f"\n4. Creating commit: '{commit_message}'...")
     if not run_command(f'git commit -m "{commit_message}"'):
-        print("❌ Failed to commit (maybe no changes?)")
+        print("❌ Failed to commit")
         return False
     
     # Push to GitHub
-    print("\n4. Pushing to GitHub...")
-    if not run_command("git push origin main"):
-        # Try 'master' if 'main' fails
-        print("Trying 'master' branch...")
-        if not run_command("git push origin master"):
-            print("❌ Failed to push changes")
-            return False
+    print(f"\n5. Pushing to GitHub ({current_branch})...")
+    if not run_command(f"git push origin {current_branch}"):
+        print("❌ Failed to push changes")
+        print("💡 Make sure you have:")
+        print("   - Configured git credentials")
+        print("   - Have push access to the repository")
+        print("   - Internet connection is active")
+        return False
     
     print("\n✅ Success! Your GitHub contribution has been logged.")
     print(f"🌟 Check your profile: https://github.com/pathumzcode")
