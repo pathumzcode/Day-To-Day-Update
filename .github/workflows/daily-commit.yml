@@ -1,0 +1,40 @@
+name: Daily GitHub Streak
+
+on:
+  schedule:
+    # Run every day at 00:00 UTC (adjust to your timezone if needed)
+    # This runs at 5:30 AM IST (Sri Lanka time)
+    - cron: '0 0 * * *'
+  
+  # Allow manual trigger from Actions tab
+  workflow_dispatch:
+
+jobs:
+  daily-commit:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Configure Git
+        run: |
+          git config --global user.name "pathumzcode"
+          git config --global user.email "pathumzcode@users.noreply.github.com"
+      
+      - name: Update activity log
+        run: |
+          echo "[$(date '+%Y-%m-%d %H:%M:%S')] Daily activity logged" >> daily_activity.log
+      
+      - name: Commit and push changes
+        run: |
+          git add daily_activity.log
+          git commit -m "Daily update: $(date '+%Y-%m-%d')" || echo "No changes to commit"
+          git push origin Updates
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
